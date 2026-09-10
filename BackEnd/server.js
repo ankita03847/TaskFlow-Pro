@@ -14,8 +14,10 @@ const app = express();
 // Trust reverse proxies (Render, Railway, Vercel, Nginx) so req.protocol and client IP work correctly
 app.set("trust proxy", 1);
 
-// Connect Database
-connectDB();
+// Connect Database on standalone startup (handled per-request on serverless)
+if (!process.env.VERCEL) {
+  connectDB();
+}
 
 // Middleware to handle CORS (supports single URL, multiple comma-separated URLs, or wildcard '*')
 const clientUrl = process.env.CLIENT_URL;
@@ -42,18 +44,23 @@ const uploadsDir = fs.existsSync(path.join(__dirname, "Uploads"))
   : path.join(__dirname, "uploads");
 app.use("/uploads", express.static(uploadsDir));
 
-// Ensure MongoDB connection is established for serverless requests
-app.use(async (req, res, next) => {
-  await connectDB();
-  next();
-});
-
-// Root API Health Check Route
+// Root API Health Check Route (always responds immediately with 200 OK)
 app.get("/", (req, res) => {
   res.status(200).json({
     status: "online",
     message: "TaskFlow Pro Backend API is running smoothly 🚀",
   });
+});
+
+// Ensure MongoDB connection is established before handling API requests
+app.use("/api", async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error("Database connection middleware error:", err);
+    res.status(500).json({ message: "Database connection failed", error: err.message });
+  }
 });
 
 // Routes
@@ -92,7 +99,7 @@ app.use((err, req, res, next) => {
 module.exports = app;
 
 // Start Server in standalone / local development environments
-if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+if (!process.env.VERCEL) {
   const PORT = process.env.PORT || 8080;
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
