@@ -38,10 +38,13 @@ app.use(
 // Middleware to parse JSON
 app.use(express.json());
 
-// Serve static uploaded files (supports both uploads and Uploads directory)
-const uploadsDir = fs.existsSync(path.join(__dirname, "Uploads"))
-  ? path.join(__dirname, "Uploads")
-  : path.join(__dirname, "uploads");
+// Serve static uploaded files (supports both uploads, Uploads, and /tmp on Vercel)
+const os = require("os");
+const uploadsDir = process.env.VERCEL
+  ? path.join(os.tmpdir(), "uploads")
+  : fs.existsSync(path.join(__dirname, "Uploads"))
+    ? path.join(__dirname, "Uploads")
+    : path.join(__dirname, "uploads");
 app.use("/uploads", express.static(uploadsDir));
 
 // Root API Health Check Route (always responds immediately with 200 OK)

@@ -1,14 +1,22 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
-// Ensure uploads directory exists (support both uploads and Uploads directory)
-const uploadDir = fs.existsSync(path.join(__dirname, '../Uploads'))
-  ? path.join(__dirname, '../Uploads')
-  : path.join(__dirname, '../uploads');
+// Ensure uploads directory exists (uses /tmp on Vercel serverless since /var/task is read-only)
+const isServerless = !!process.env.VERCEL;
+const uploadDir = isServerless
+  ? path.join(os.tmpdir(), 'uploads')
+  : fs.existsSync(path.join(__dirname, '../Uploads'))
+    ? path.join(__dirname, '../Uploads')
+    : path.join(__dirname, '../uploads');
 
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (err) {
+  console.warn("Upload directory check:", err.message);
 }
 
 // Configure storage
