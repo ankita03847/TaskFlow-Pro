@@ -1,6 +1,9 @@
-// Dynamic backend URL: uses VITE_API_BASE_URL in production or defaults to localhost:8080 in development
+// Dynamic backend URL: uses VITE_API_BASE_URL, or live Vercel backend in production, or localhost:8080 in local development
 export const BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.PROD
+    ? "https://task-flow-pro-snowy-tau.vercel.app"
+    : "http://localhost:8080")
 ).replace(/\/+$/, "");
 
 // utils/ApiPath.js
