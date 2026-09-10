@@ -42,6 +42,20 @@ const uploadsDir = fs.existsSync(path.join(__dirname, "Uploads"))
   : path.join(__dirname, "uploads");
 app.use("/uploads", express.static(uploadsDir));
 
+// Ensure MongoDB connection is established for serverless requests
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
+
+// Root API Health Check Route
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "online",
+    message: "TaskFlow Pro Backend API is running smoothly 🚀",
+  });
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
