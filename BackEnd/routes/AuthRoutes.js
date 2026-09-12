@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const { registerUser, loginUser, getUserProfile, updateUserProfile } = require('../controllers/AuthController');
+const { registerUser, loginUser, getUserProfile, updateUserProfile, resetPassword } = require('../controllers/AuthController');
 const { protect, adminOnly } = require("../Middlewares/authMiddleware");
 const upload = require("../Middlewares/uploadMiddleware");
 
 // Auth Routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+router.post("/reset-password", resetPassword);
 router.get("/profile", protect, getUserProfile);
 router.put("/profile", protect, updateUserProfile);
 

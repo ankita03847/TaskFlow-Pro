@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import AuthLayout from '../../components/layout/AuthLayout';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Input from '../../components/Inputs/inputs';
 import { validateEmail } from '../../utils/helper';
 import axiosInstance from '../../utils/Axiosinstance';
@@ -8,7 +8,8 @@ import { API_PATHS } from '../../utils/ApiPath';
 import { UserContext } from '../../context/userContext';
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const [email, setEmail] = useState(location.state?.email || "");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -81,13 +82,24 @@ const Login = () => {
             type="text"
           />
 
-          <Input
-            value={password}
-            onChange={({ target }) => setPassword(target.value)}
-            label="Password"
-            placeholder="Min 8 Characters"
-            type="password"
-          />
+          <div>
+            <Input
+              value={password}
+              onChange={({ target }) => setPassword(target.value)}
+              label="Password"
+              placeholder="Min 8 Characters"
+              type="password"
+            />
+            <div className="flex justify-end -mt-2.5 mb-3">
+              <button
+                type="button"
+                onClick={() => navigate("/forgot-password", { state: { email } })}
+                className="text-xs sm:text-[13px] text-blue-600 hover:text-blue-700 hover:underline font-medium cursor-pointer transition-colors"
+              >
+                Forgot Password?
+              </button>
+            </div>
+          </div>
 
           {error && (
             <p className="text-red-500 text-xs pb-2.5 font-medium">{error}</p>

@@ -14,6 +14,7 @@ import PrivateRoute from './Route/PrivateRoute';
 // Auth Pages
 import Login from './pages/Auth/Login';
 import SignUp from './pages/Auth/Signup';
+import ForgotPassword from './pages/Auth/ForgotPassword';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -50,6 +51,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/signUp" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ForgotPassword />} />
 
             {/* Admin Routes */}
             <Route element={<PrivateRoute allowedRoles={["admin"]} />}>
